@@ -47,15 +47,49 @@ async function downloadLaatsteBestandLoyaltyProfs(req, res) {
   }
 }
 
-// Functie aanroepen met parameters
-//const host = 'sftp.loyaltyprofs.nl';
-//const port = 2222;
-//const username = 'beesda2_volvo';
-//const password = '9Hm5Rzm7oC6GZak5n63$q';
+async function uploadTSVBestandLoyaltyProfs(req, res) {
+  try {
+    // Configuratie op basis van de parameters
+	
+	let host = req.query.host;
+	let port = req.query.port;
+	let username = req.query.username;
+	let password = req.query.password;
+	 
+	let sftpFileName = req.query.sftpFileName;
+	
+	
+	const remoteMap = '/files/lptodo/' + sftpFileName ;
+	console.log('remoteMap: ' + remoteMap);
+	
+    const lokaalPad = '/volvo/' + sftpFileName;
+	console.log('lokaalPad: ' + lokaalPad);
+	
+    const config = {
+      host: host,
+      port: port || 22, // Standaardpoort 22 als geen andere opgegeven
+      username: username,
+      password: password,
+    };
 
-//downloadLaatsteBestand(req, res);
+    await sftp.connect(config);
+    console.log('Verbonden met SFTP server');
+
+    
+
+    await sftp.put(lokaalPad, remoteMap);
+    console.log('Upload succesvol');
+
+    await sftp.end();
+  } catch (err) {
+    console.error('Fout tijdens SFTP-upload:', err);
+  }
+}
+
+
 
 module.exports = {
-  downloadLaatsteBestandLoyaltyProfs : downloadLaatsteBestandLoyaltyProfs
+  downloadLaatsteBestandLoyaltyProfs : downloadLaatsteBestandLoyaltyProfs,
+  uploadTSVBestandLoyaltyProfs: uploadTSVBestandLoyaltyProfs,
   
   };
