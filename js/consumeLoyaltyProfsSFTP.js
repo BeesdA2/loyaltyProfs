@@ -2,21 +2,22 @@ const Client = require('ssh2-sftp-client');
 const sftp = new Client();
 
 async function downloadLaatsteBestandLoyaltyProfs(req, res) {
-  try {
+  try { 
     // Configuratie op basis van de parameters
 	
 	let host = req.query.host;
 	let port = req.query.port;
 	let username = req.query.username;
 	let password = req.query.password;
+	let directory = req.query.directory;
 	
 	
     const config = {
       host: host,
       port: port || 22, // Standaardpoort 22 als geen andere opgegeven
       username: username,
-      password: password,
-    };
+      password: password
+       };
 
     await sftp.connect(config);
     console.log('Verbonden met SFTP server');
@@ -36,7 +37,7 @@ async function downloadLaatsteBestandLoyaltyProfs(req, res) {
     console.log('Laatste bestand:', laatsteBestand.name);
 
     const remotePad = remoteMap + laatsteBestand.name;
-    const lokaalPad = '/volvo/LoyaltyProfs.csv';
+    const lokaalPad = directory.trim() + '/LoyaltyProfs.csv';
 
     await sftp.get(remotePad, lokaalPad);
     console.log('Download succesvol');
@@ -55,21 +56,22 @@ async function uploadTSVBestandLoyaltyProfs(req, res) {
 	let port = req.query.port;
 	let username = req.query.username;
 	let password = req.query.password;
-	 
+	let directory = req.query.directory;
+  
 	let sftpFileName = req.query.sftpFileName;
 	
 	
 	const remoteMap = '/files/lptodo/' + sftpFileName ;
 	console.log('remoteMap: ' + remoteMap);
 	
-    const lokaalPad = '/volvo/' + sftpFileName;
+    const lokaalPad = directory.trim() + '/' + sftpFileName;
 	console.log('lokaalPad: ' + lokaalPad);
 	
     const config = {
       host: host,
       port: port || 22, // Standaardpoort 22 als geen andere opgegeven
       username: username,
-      password: password,
+      password: password
     };
 
     await sftp.connect(config);
